@@ -1,21 +1,21 @@
 const express = 'express';
-const posts = require('../posts/postDb');
+const postsDb = require('../posts/postDb');
+const userDb = require('../users/userDb')
 const postRouter = require('express').Router({ mergeParams: true });
 const logger = '../../index.js'
 
-// postRouter.get('/', (req, res) => {
-//     res.send('YOOO from postRouter');
-// });
-
-postRouter.get('/posts', (req, res) => {
-    posts
-        .get()
-        .then(foundPosts => {
-            res.json(foundPosts);
+postRouter.get('/posts', async (req, res) => {
+    try {
+        const { id } = req.user
+        const posts = await userDb.getUserPosts(id)
+        res.status(200).json({
+            posts
         })
-        .catch(err => {
-            // return errorHelper(500, 'Database boof', res);
-        });
+    } catch (error) {
+        res.status(500).json({
+            error: `An error occurred while attempting to get the user's posts`
+        })
+    }
 });
 
 postRouter.get('/api/posts/:id', (req, res) => {
