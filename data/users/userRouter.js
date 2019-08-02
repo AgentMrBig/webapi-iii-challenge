@@ -116,41 +116,4 @@ userRouter.delete('/api/users/:id', (req, res) => {
         });
 });
 
-//custom middleware
-
-function validateUserId(req, res, next) {
-    //const { user_id } = req.body;
-    if (!req.params.id) {
-        // need to check if id match any user id in database
-        res
-            .status(404)
-            .json({ success: false, errorMessage: 'invalid user id' })
-    } else {
-        // store user object as req.user
-    }
-};
-
-function validateUser(req, res, next) {
-    const { name } = req.body;
-
-    if (!req.body) {
-        res
-            .status(400)
-            .json({ success: false, errorMessage: 'missing user data' })
-    } else if (!name) {
-        res
-            .status(400)
-            .json({ success: false, errorMessage: 'missing required name field' })
-    } else {
-        res
-            .status(200)
-            .json({ success: true, message: 'User Validated' })
-    }
-};
-
-
-function validatePost(req, res, next) {
-
-};
-
 module.exports = userRouter;
