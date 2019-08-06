@@ -31,20 +31,16 @@ const validateUserId = async (req, res, next) => {
 const validateUser = (req, res, next) => {
     const { body } = req;
 
-    if (!body) {
-        res
-            .status(400)
-            .json({ success: false, errorMessage: 'missing user data' })
+    if (Object.keys(body).length === 0) {
+        res.status(400).json({
+            message: `Missing user data`
+        })
     }
     const { name } = body
     if (!name) {
-        res
-            .status(400)
-            .json({ success: false, errorMessage: 'missing required name field' })
-    } else {
-        res
-            .status(200)
-            .json({ success: true, message: 'User Validated' })
+        res.status(400).json({
+            message: `Missing required field: name`
+        })
     }
     next()
 };
@@ -52,17 +48,18 @@ const validateUser = (req, res, next) => {
 
 const validatePost = (req, res, next) => {
     const { body } = req
-    if (!body) {
-        res
-            .status(400)
-            .json({ success: false, errorMessage: 'Missing post data' })
+    if (Object.keys(body).length === 0) {
+        res.status(400).json({
+            message: `Missing post data`
+        })
     }
     const { text } = body
     if (!text) {
         res.status(400).json({
-            errorMessage: 'Missing required field: text'
+            message: `Missing required field: text`
         })
     }
+    next()
 };
 
 module.exports = { logger, validateUserId, validateUser, validatePost }
