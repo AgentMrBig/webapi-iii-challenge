@@ -1,4 +1,4 @@
-const users = require('../users/userDb')
+const usersDb = require('../users/userDb')
 
 //custom middleware
 const logger = (req, res, next) => {
@@ -9,24 +9,24 @@ const logger = (req, res, next) => {
 };
 
 const validateUserId = async (req, res, next) => {
-    const user_id = req.body.id;
-    const user = await users.getById(user_id);
+    const { id } = req.params
+    const user = await usersDb.getById(id)
+
     try {
-        if (!user) {
-            res
-                .status(400)
-                .json({ success: false, errorMessage: 'Invalid user id' })
-        } else {
+        if (user) {
             req['user'] = user
+            next()
+        } else {
+            res.status(404).json({ success: false, errorMessage: 'Invalid user id' })
             next()
         }
     } catch (error) {
         res.status(500).json({
-            errorMessage: 'missing user data'
+            error: `missing user data: ${error}`
         })
     }
 
-};
+}
 
 const validateUser = (req, res, next) => {
     const { body } = req;

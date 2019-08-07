@@ -1,15 +1,13 @@
-const express = 'express';
-const userDb = require('../users/userDb');
-const userRouter = require('express').Router({ mergeParams: true });
-const postRouter = require('../posts/postRouter')
-const { validateUserId, validateUser } = require('../middleware/index')
+const router = require('express').Router()
+const postsRouter = require('../posts/postRouter')
+const usersDb = require('../users/userDb')
+const { validateUserId, validateUser } = require('../middleware')
 
+router.use('/:id/posts', validateUserId, postsRouter)
 
-userRouter.use('/:id/posts', validateUserId, postRouter)
-
-userRouter.get('/', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const users = await userDb.get()
+        const users = await usersDb.get()
         res.status(200).json({
             users
         })
@@ -20,15 +18,21 @@ userRouter.get('/', async (req, res) => {
     }
 })
 
-userRouter.get('/:id', validateUserId, (req, res) => {
-    const { user } = req
-    res.status(200).json(user)
+router.get('/:id', validateUserId, (req, res) => {
+    try {
+        const { user } = req
+        res.status(200).json(user)
+    } catch (error) {
+        res.status(500).json({
+            error: `An error occurred getting user by id: ${error}`
+        })
+    }
 })
 
-userRouter.post('/', validateUser, async (req, res) => {
+router.post('/', validateUser, async (req, res) => {
     try {
         const { name } = req.body
-        const user = await userDb.insert({ name })
+        const user = await usersDb.insert({ name })
         res.status(201).json(user)
     } catch (error) {
         res.status(500).json({
@@ -37,10 +41,10 @@ userRouter.post('/', validateUser, async (req, res) => {
     }
 })
 
-userRouter.delete('/:id', validateUserId, async (req, res) => {
+router.delete('/:id', validateUserId, async (req, res) => {
     try {
         const { id } = req.user
-        await userDb.remove(id)
+        await usersDb.remove(id)
         res.status(204).end()
     } catch (error) {
         res.status(500).json({
@@ -49,11 +53,11 @@ userRouter.delete('/:id', validateUserId, async (req, res) => {
     }
 })
 
-userRouter.put('/:id', validateUserId, validateUser, async (req, res) => {
+router.put('/:id', validateUserId, validateUser, async (req, res) => {
     try {
         const { id } = req.user
         const { name } = req.body
-        await userDb.update(id, { name })
+        await usersDb.update(id, { name })
         res.status(204).end()
     } catch (error) {
         res.status(500).json({
@@ -62,4 +66,4 @@ userRouter.put('/:id', validateUserId, validateUser, async (req, res) => {
     }
 })
 
-module.exports = userRouter;
+module.exports = router
